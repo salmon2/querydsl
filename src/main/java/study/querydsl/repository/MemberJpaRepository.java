@@ -115,6 +115,24 @@ public class MemberJpaRepository {
                 )
                 .fetch();
     }
+    public List<Member> searchMember(MemberSearchCondition condition){
+        return queryFactory
+                .selectFrom(member)
+                .leftJoin(member.team, team)
+                .where(
+                        /**
+                         * 메소드 재사용 가능
+                         */
+                        usernameEq(condition.getUsername()),
+                        teamNameEq(condition.getTeamName()),
+                        ageGoe(condition.getAgeGoe()),
+                        ageLoe(condition.getAgeLoe())
+                )
+                .fetch();
+    }
+    private BooleanExpression ageBetwen(int ageLoe, int ageGoe){
+        return ageGoe(ageLoe).and(ageGoe(ageGoe));
+    }
 
     private BooleanExpression usernameEq(String username) {
         return StringUtils.hasText(username)
